@@ -55,18 +55,18 @@ permissions:
     contents: write
     pull-requests: write
 
-env: saturn
+env: 
   #
   # Credentials
   #
 
-#   ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-#   ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-#   ARM_ENVIRONMENT: ${{ secrets.ARM_ENVIRONMENT }}
-#   ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-#   ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-#   AZOPS_MODULE_VERSION: ${{ secrets.AZOPS_MODULE_VERSION }}
-#   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+  ARM_ENVIRONMENT: ${{ secrets.ARM_ENVIRONMENT }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+  AZOPS_MODULE_VERSION: ${{ secrets.AZOPS_MODULE_VERSION }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
   #
   # modulesFolder
@@ -138,7 +138,7 @@ jobs:
     # https://github.com/azure/azops/wiki/github-oidc
     #
 
-    # environment: prod 
+    environment: saturn
 
     #
     # Only run Pull after successful Push or on manually triggered/scheduled events
