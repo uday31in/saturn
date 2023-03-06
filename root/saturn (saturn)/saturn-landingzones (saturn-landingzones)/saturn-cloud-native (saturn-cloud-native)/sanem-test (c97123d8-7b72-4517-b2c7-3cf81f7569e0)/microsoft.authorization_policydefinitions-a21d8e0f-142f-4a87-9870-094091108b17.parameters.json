@@ -1,0 +1,72 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input": {
+      "value": {
+        "kind": "policydefinitions",
+        "location": "global",
+        "name": "a21d8e0f-142f-4a87-9870-094091108b17",
+        "properties": {
+          "description": "Denies deployments of Azure Database Flexible Server for PostgreSQL without Customer Managed Keys on Azure Key Vault present",
+          "displayName": "Enforce Customer Managed Keys for PostgreSQL Flexible database",
+          "metadata": {
+            "category": "PostgreSQL"
+          },
+          "mode": "Indexed",
+          "parameters": {
+            "effect": {
+              "allowedValues": [
+                "Deny",
+                "Audit",
+                "Disabled"
+              ],
+              "defaultValue": "Deny",
+              "metadata": {
+                "description": "Enable or disable the execution of the policy",
+                "displayName": "Effect"
+              },
+              "type": "String"
+            },
+            "minimalTlsVersion": {
+              "allowedValues": [
+                "TLS1_2",
+                "TLS1_0",
+                "TLS1_1",
+                "TLSEnforcementDisabled"
+              ],
+              "defaultValue": "TLS1_2",
+              "metadata": {
+                "description": "Select version minimum TLS version Azure Database for PostgreSQL server to enforce",
+                "displayName": "Select minimum TLS version for PostgreSQL server"
+              },
+              "type": "String"
+            }
+          },
+          "policyRule": {
+            "if": {
+              "allOf": [
+                {
+                  "equals": "Microsoft.DBforPostgreSQL/servers",
+                  "field": "type"
+                },
+                {
+                  "exists": "true",
+                  "field": "Microsoft.DBforPostgreSQL/servers/minimalTlsVersion"
+                },
+                {
+                  "field": "Microsoft.DBforPostgreSQL/servers/minimalTlsVersion",
+                  "notEquals": "[parameters('minimalTlsVersion')]"
+                }
+              ]
+            },
+            "then": {
+              "effect": "[parameters('effect')]"
+            }
+          }
+        },
+        "type": "Microsoft.Authorization/policyDefinitions"
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input": {
+      "value": {
+        "kind": "policydefinitions",
+        "location": "global",
+        "name": "6118c939-7607-4991-9fa0-80811312ab36",
+        "properties": {
+          "description": "Denies deployments of Azure Database Flexible Server for PostgreSQL without Customer Managed Keys on Azure Key Vault present.",
+          "displayName": "Enforce Customer Managed Keys for PostgreSQL Flexible database",
+          "metadata": {
+            "category": "PostgreSQL"
+          },
+          "mode": "Indexed",
+          "parameters": {
+            "effect": {
+              "allowedValues": [
+                "Deny",
+                "Audit",
+                "Disabled"
+              ],
+              "defaultValue": "Deny",
+              "metadata": {
+                "description": "Enable or disable the execution of the policy",
+                "displayName": "Effect"
+              },
+              "type": "String"
+            }
+          },
+          "policyRule": {
+            "if": {
+              "anyOf": [
+                {
+                  "field": "Microsoft.DBForPostgreSql/flexibleServers/dataEncryption.type",
+                  "notEquals": "AzureKeyVault"
+                },
+                {
+                  "exists": "false",
+                  "field": "Microsoft.DBForPostgreSql/flexibleServers/dataEncryption.primaryKeyURI"
+                },
+                {
+                  "exists": "false",
+                  "field": "Microsoft.DBForPostgreSql/flexibleServers/dataEncryption.primaryUserAssignedIdentityId"
+                }
+              ]
+            },
+            "then": {
+              "effect": "[parameters('effect')]"
+            }
+          }
+        },
+        "type": "Microsoft.Authorization/policyDefinitions"
+      }
+    }
+  }
+}
