@@ -56,7 +56,7 @@ jobs:
     # https://github.com/azure/azops/wiki/github-oidc
     #
 
-    # environment: prod 
+    environment: saturn
 
 
     steps:
