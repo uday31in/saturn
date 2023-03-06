@@ -1,0 +1,92 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input": {
+      "value": {
+        "kind": "policydefinitions",
+        "location": "global",
+        "name": "de67e1fb-71fc-4ec3-80b8-f04d7d324412",
+        "properties": {
+          "description": "This Policy will deny/audit Service Endpoints on subnets. Service Endpoints allows the network traffic to bypass Network appliances, such as the Azure Firewall.",
+          "displayName": "Uday-Deny or Audit service endpoints on subnets",
+          "metadata": {
+            "category": "Network"
+          },
+          "mode": "All",
+          "parameters": {
+            "effect": {
+              "allowedValues": [
+                "Audit",
+                "Deny",
+                "Disabled"
+              ],
+              "defaultValue": "Deny",
+              "metadata": {
+                "description": "Enable or disable the execution of the policy",
+                "displayName": "Effect"
+              },
+              "type": "String"
+            }
+          },
+          "policyRule": {
+            "if": {
+              "anyOf": [
+                {
+                  "allOf": [
+                    {
+                      "equals": "Microsoft.Network/virtualNetworks/subnets",
+                      "field": "type"
+                    },
+                    {
+                      "count": {
+                        "field": "Microsoft.Network/virtualNetworks/subnets/serviceEndpoints[*]",
+                        "where": {
+                          "exists": "true",
+                          "field": "Microsoft.Network/virtualNetworks/subnets/serviceEndpoints[*].service"
+                        }
+                      },
+                      "greater": 0
+                    }
+                  ]
+                },
+                {
+                  "allOf": [
+                    {
+                      "equals": "Microsoft.Network/virtualNetworks",
+                      "field": "type"
+                    },
+                    {
+                      "count": {
+                        "field": "Microsoft.Network/virtualNetworks/subnets[*]",
+                        "where": {
+                          "allOf": [
+                            {
+                              "count": {
+                                "field": "Microsoft.Network/virtualNetworks/subnets/serviceEndpoints[*]",
+                                "where": {
+                                  "exists": "true",
+                                  "field": "Microsoft.Network/virtualNetworks/subnets/serviceEndpoints[*].service"
+                                }
+                              },
+                              "greater": 0
+                            }
+                          ]
+                        }
+                      },
+                      "notEquals": 0
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "effect": "[parameters('effect')]"
+            }
+          }
+        },
+        "type": "Microsoft.Authorization/policyDefinitions"
+      }
+    }
+  }
+}

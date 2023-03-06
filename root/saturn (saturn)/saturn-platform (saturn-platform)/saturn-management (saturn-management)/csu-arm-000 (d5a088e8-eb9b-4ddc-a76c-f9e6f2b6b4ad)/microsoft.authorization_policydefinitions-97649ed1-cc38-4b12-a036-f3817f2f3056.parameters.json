@@ -1,0 +1,124 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input": {
+      "value": {
+        "kind": "policydefinitions",
+        "location": "global",
+        "name": "97649ed1-cc38-4b12-a036-f3817f2f3056",
+        "properties": {
+          "displayName": "rbac-test",
+          "metadata": {},
+          "mode": "All",
+          "parameters": {
+            "effect": {
+              "allowedValues": [
+                "deny",
+                "audit",
+                "disabled"
+              ],
+              "defaultValue": "audit",
+              "metadata": {
+                "description": "Enable, audit or disable the execution of the policy",
+                "displayName": "Effect"
+              },
+              "type": "String"
+            },
+            "listOfExemptedServices": {
+              "metadata": {
+                "description": "List of services which can have an unallowed Built-In assigned at their scopes.",
+                "displayName": "Exempted services from unallowed built-in roles for users"
+              },
+              "type": "Array"
+            },
+            "listOfPlatformOpsUsers": {
+              "metadata": {
+                "description": "List of GUID for well-known PlatformOps allowed to use any roles.",
+                "displayName": "PlatformOps users that are allowed to use any roles"
+              },
+              "type": "Array"
+            },
+            "listOfUnAllowedBuiltinRoles": {
+              "metadata": {
+                "description": "List of GUID for well-known built-in roles not allowed to be used.",
+                "displayName": "Built-in roles (GUID) not allowed to be used"
+              },
+              "type": "Array"
+            }
+          },
+          "policyRule": {
+            "if": {
+              "allOf": [
+                {
+                  "equals": "Microsoft.Authorization/roleAssignments",
+                  "field": "type"
+                },
+                {
+                  "field": "Microsoft.Authorization/roleAssignments/principalType",
+                  "in": [
+                    "User",
+                    "Group",
+                    "user",
+                    "group"
+                  ]
+                },
+                {
+                  "not": {
+                    "exists": "true",
+                    "field": "Microsoft.Authorization/roleAssignments/principalType"
+                  }
+                },
+                {
+                  "field": "Microsoft.Authorization/roleAssignments/principalId",
+                  "notIn": "[parameters('listOfPlatformOpsUsers')]"
+                },
+                {
+                  "in": "[parameters('listOfUnAllowedBuiltinRoles')]",
+                  "value": "[last(split(field('Microsoft.Authorization/roleAssignments/roleDefinitionId'),'/'))]"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "count": {
+                        "name": "service",
+                        "value": "[parameters('listOfExemptedServices')]",
+                        "where": {
+                          "contains": "[current('service')]",
+                          "field": "Microsoft.Authorization/roleAssignments/scope"
+                        }
+                      },
+                      "equals": 0
+                    },
+                    {
+                      "field": "Microsoft.Authorization/roleAssignments/scope",
+                      "in": [
+                        "-"
+                      ]
+                    },
+                    {
+                      "field": "Microsoft.Authorization/roleAssignments/principalId",
+                      "in": [
+                        "-"
+                      ]
+                    },
+                    {
+                      "field": "Microsoft.Authorization/roleAssignments/roleDefinitionId",
+                      "in": [
+                        "-"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "effect": "[parameters('effect')]"
+            }
+          }
+        },
+        "type": "Microsoft.Authorization/policyDefinitions"
+      }
+    }
+  }
+}

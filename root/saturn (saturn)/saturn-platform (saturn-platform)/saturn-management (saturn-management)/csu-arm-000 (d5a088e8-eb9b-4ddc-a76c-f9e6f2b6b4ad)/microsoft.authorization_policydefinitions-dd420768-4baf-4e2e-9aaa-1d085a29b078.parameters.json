@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input": {
+      "value": {
+        "kind": "policydefinitions",
+        "location": "global",
+        "name": "dd420768-4baf-4e2e-9aaa-1d085a29b078",
+        "properties": {
+          "displayName": "kn-rbac",
+          "metadata": {},
+          "mode": "All",
+          "parameters": {
+            "effect": {
+              "allowedValues": [
+                "deny",
+                "audit",
+                "disabled"
+              ],
+              "defaultValue": "audit",
+              "metadata": {
+                "description": "Enable, audit or disable the execution of the policy",
+                "displayName": "Effect"
+              },
+              "type": "String"
+            },
+            "listOfPlatformOpsUsers": {
+              "metadata": {
+                "description": "List of GUID for well-known PlatformOps allowed to use any roles.",
+                "displayName": "PlatformOps users that are allowed to use any roles"
+              },
+              "type": "Array"
+            },
+            "listOfUnAllowedBuiltinRoles": {
+              "metadata": {
+                "description": "List of GUID for well-known built-in roles not allowed to be used.",
+                "displayName": "Built-in roles (GUID) not allowed to be used"
+              },
+              "type": "Array"
+            }
+          },
+          "policyRule": {
+            "if": {
+              "allOf": [
+                {
+                  "equals": "Microsoft.Authorization/roleAssignments",
+                  "field": "type"
+                },
+                {
+                  "field": "Microsoft.Authorization/roleAssignments/principalType",
+                  "in": [
+                    "User",
+                    "Group",
+                    "user",
+                    "group"
+                  ]
+                },
+                {
+                  "field": "Microsoft.Authorization/roleAssignments/principalId",
+                  "notIn": "[parameters('listOfPlatformOpsUsers')]"
+                },
+                {
+                  "in": "[parameters('listOfUnAllowedBuiltinRoles')]",
+                  "value": "[last(split(field('Microsoft.Authorization/roleAssignments/roleDefinitionId'),'/'))]"
+                },
+                {
+                  "exists": "false",
+                  "field": "Microsoft.Authorization/roleAssignments/principalType"
+                }
+              ]
+            },
+            "then": {
+              "effect": "[parameters('effect')]"
+            }
+          }
+        },
+        "type": "Microsoft.Authorization/policyDefinitions"
+      }
+    }
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input": {
+      "value": {
+        "kind": "policydefinitions",
+        "location": "global",
+        "name": "8821b801-fc08-4583-b58d-d9d33679a68e",
+        "properties": {
+          "displayName": "principalType",
+          "metadata": {},
+          "mode": "All",
+          "parameters": {
+            "effect": {
+              "allowedValues": [
+                "deny",
+                "audit",
+                "disabled"
+              ],
+              "defaultValue": "deny",
+              "metadata": {
+                "description": "Enable, audit or disable the execution of the policy",
+                "displayName": "Effect"
+              },
+              "type": "String"
+            }
+          },
+          "policyRule": {
+            "if": {
+              "allOf": [
+                {
+                  "equals": "Microsoft.Authorization/roleAssignments",
+                  "field": "type"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "exists": "false",
+                      "field": "Microsoft.Authorization/roleAssignments/principalType"
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "effect": "[parameters('effect')]"
+            }
+          }
+        },
+        "type": "Microsoft.Authorization/policyDefinitions"
+      }
+    }
+  }
+}

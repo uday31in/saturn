@@ -1,0 +1,40 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input": {
+      "value": {
+        "kind": "policydefinitions",
+        "location": "global",
+        "name": "denyEndpoint",
+        "properties": {
+          "description": "testing",
+          "displayName": "test",
+          "metadata": {},
+          "policyRule": {
+            "if": {
+              "allOf": [
+                {
+                  "equals": "Microsoft.Web/sites/privateEndpointConnections",
+                  "field": "type"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "equals": "Pending",
+                      "field": "Microsoft.Web/sites/privateEndpointConnections/privateLinkServiceConnectionState.status"
+                    }
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "effect": "deny"
+            }
+          }
+        },
+        "type": "Microsoft.Authorization/policyDefinitions"
+      }
+    }
+  }
+}

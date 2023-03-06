@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "input": {
+      "value": {
+        "kind": "policydefinitions",
+        "location": "global",
+        "name": "99e782c1-71d8-48c3-81c8-470c79b10067",
+        "properties": {
+          "displayName": "kn-rbac",
+          "metadata": {},
+          "mode": "All",
+          "parameters": {
+            "roleDefinitionIds": {
+              "metadata": {
+                "description": "The list of role definition Ids",
+                "displayName": "Approved Role Definitions"
+              },
+              "type": "Array"
+            }
+          },
+          "policyRule": {
+            "if": {
+              "allOf": [
+                {
+                  "equals": "Microsoft.Authorization/roleAssignments",
+                  "field": "type"
+                },
+                {
+                  "not": {
+                    "field": "Microsoft.Authorization/roleAssignments/roleDefinitionId",
+                    "in": "[parameters('roleDefinitionIds')]"
+                  }
+                }
+              ]
+            },
+            "then": {
+              "effect": "deny"
+            }
+          }
+        },
+        "type": "Microsoft.Authorization/policyDefinitions"
+      }
+    }
+  }
+}
